@@ -3,74 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yesman Panadería S.A.S</title>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js?v=2026"></script>
+    <title>YESMAN PANADERÍA S.A.S</title>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; margin: 0; }
-        .app-card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 30px; margin-top: 15px; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .balance-box { background: #1a1a1a; padding: 20px; border-radius: 20px; margin: 20px 0; border: 1px solid #333; }
-        .balance-val { font-size: 32px; font-weight: bold; color: #FFD700; font-family: monospace; }
-        .btn-main { padding: 18px; width: 100%; border-radius: 18px; border: none; font-weight: 800; margin: 10px 0; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        #connectBtn { background: #FFD700; color: #000; }
-        #depositBtn { background: #0088cc; color: #fff; }
-        #depositBtn:disabled { background: #222; color: #555; cursor: not-allowed; }
-        .status-dot { font-size: 12px; color: #888; margin-top: 10px; }
+        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
+        .card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 25px; box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+        .balance { font-size: 32px; font-weight: bold; margin: 20px 0; color: #FFD700; font-family: monospace; }
+        .btn { padding: 20px; width: 100%; border-radius: 15px; border: none; font-weight: bold; margin: 10px 0; font-size: 16px; cursor: pointer; }
+        #conBtn { background: #FFD700; color: #000; }
+        #depBtn { background: #0088cc; color: #fff; display: none; }
     </style>
 </head>
 <body>
-    <div class="app-card">
-        <h2 style="margin:0; letter-spacing: 1px;">YESMAN PANADERÍA S.A.S</h2>
-        <p style="font-size:10px; color:#888; margin-bottom: 25px;">INVERSIÓN DIGITAL $PAN</p>
+    <div class="card">
+        <h2>YESMAN PANADERÍA S.A.S</h2>
+        <p style="font-size:10px; color:#888;">INVERSIÓN DIGITAL $PAN</p>
         
-        <button class="btn-main" id="connectBtn">VINCULAR BILLETERA</button>
+        <button class="btn" id="conBtn">VINCULAR BILLETERA</button>
 
-        <div class="balance-box">
-            <div class="balance-val" id="bLive">0.000002015</div>
-            <div style="font-size: 10px; color: #FFD700; margin-top: 5px;">PRODUCCIÓN ACTIVA</div>
-        </div>
+        <div class="balance" id="bLive">0.000002015</div>
         
-        <div id="stLabel" class="status-dot">🔴 Esperando conexión...</div>
+        <p id="stTxt" style="font-size:12px; color:#FFD700;">🔴 ESPERANDO CONEXIÓN</p>
 
-        <button class="btn-main" id="depositBtn" disabled>DEPÓSITO (1 TON)</button>
+        <button class="btn" id="depBtn">EFECTUAR DEPÓSITO (1 TON)</button>
+        
+        <p style="font-size:10px; color:#555; margin-top:15px;">Si el botón no abre, abre Tonkeeper manualmente después de pulsar.</p>
     </div>
 
     <script>
-        // Sistema de minería
-        let val = 0.000002015;
-        setInterval(() => { val += 0.000000001; document.getElementById('bLive').innerText = val.toFixed(9); }, 1000);
+        // Balance de 9 decimales (Tu instrucción)
+        let b = 0.000002015;
+        setInterval(() => { b += 0.000000001; document.getElementById('bLive').innerText = b.toFixed(9); }, 1000);
 
-        // Inicialización de TON Connect
+        // Inicializamos TON Connect
         const tonUI = new TONConnectUI.TonConnectUI({
             manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
         });
 
-        // Lógica de conexión
-        document.getElementById('connectBtn').onclick = async () => {
+        document.getElementById('conBtn').onclick = async () => {
             try {
+                // INTENTO 1: El normal
                 await tonUI.openModal();
             } catch (e) {
-                alert("Error de conexión. Reintenta.");
+                // INTENTO 2: Forzar link directo si el navegador bloquea el cuadro
+                window.location.href = "ton://connect"; 
+                alert("Redirigiendo a Tonkeeper...");
             }
         };
 
-        // Cambio de estado
-        tonUI.onStatusChange(wallet => {
-            if (wallet) {
-                document.getElementById('depositBtn').disabled = false;
-                document.getElementById('stLabel').innerText = "🟢 Billetera Conectada";
-                document.getElementById('connectBtn').innerText = "VINCULADO";
-                document.getElementById('connectBtn').style.background = "#28a745";
-                document.getElementById('connectBtn').style.color = "#fff";
+        tonUI.onStatusChange(w => {
+            if (w) {
+                document.getElementById('conBtn').style.display = 'none';
+                document.getElementById('depBtn').style.display = 'block';
+                document.getElementById('stTxt').innerText = "🟢 CONECTADO";
             }
         });
 
-        // Botón de pago
-        document.getElementById('depositBtn').onclick = async () => {
+        document.getElementById('depBtn').onclick = async () => {
             const tx = {
                 validUntil: Math.floor(Date.now() / 1000) + 300,
                 messages: [{ address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2", amount: "1000000000" }]
             };
-            await tonUI.sendTransaction(tx).catch(() => alert("Pago cancelado"));
+            await tonUI.sendTransaction(tx).catch(() => alert("Transacción cancelada"));
         };
     </script>
 </body>
