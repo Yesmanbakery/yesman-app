@@ -3,72 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yesman Panadería S.A.S</title>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <title>PANADERIA YESMAN DIGITAL</title>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js?v=99"></script>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; margin: 0; }
-        .card { background: #111; border: 2px solid #FFD700; border-radius: 20px; padding: 25px; margin-top: 20px; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
-        .balance { font-size: 32px; font-weight: bold; margin: 20px 0; color: #FFD700; font-family: monospace; }
-        .btn { padding: 18px; width: 100%; border-radius: 15px; border: none; font-weight: bold; margin: 10px 0; font-size: 16px; cursor: pointer; }
-        #conBtn { background: #FFD700; color: #000; }
-        #depBtn { background: #0088cc; color: #fff; }
-        #depBtn:disabled { background: #222; color: #555; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #050505; color: #fff; text-align: center; padding: 20px; margin: 0; }
+        .main-card { background: linear-gradient(145deg, #1a1a1a, #000); border: 2px solid #FFD700; border-radius: 30px; padding: 30px; margin-top: 10px; box-shadow: 0 10px 30px rgba(255,215,0,0.15); }
+        .token-name { color: #FFD700; font-weight: 900; font-size: 22px; letter-spacing: 1px; margin-bottom: 5px; }
+        .balance-container { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; margin: 20px 0; border: 1px solid #333; }
+        .balance-num { font-size: 34px; font-weight: bold; font-family: 'Courier New', monospace; color: #fff; }
+        .btn-action { padding: 20px; width: 100%; border-radius: 20px; border: none; font-weight: 800; margin: 12px 0; font-size: 16px; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        #connectBtn { background: #FFD700; color: #000; box-shadow: 0 5px 15px rgba(255,215,0,0.4); }
+        #depositBtn { background: #0088cc; color: #fff; }
+        #depositBtn:disabled { background: #222; color: #444; box-shadow: none; cursor: not-allowed; }
+        .status-pill { font-size: 11px; padding: 5px 15px; border-radius: 20px; background: #222; display: inline-block; margin-top: 10px; border: 1px solid #444; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 style="margin:0;">YESMAN PANADERÍA S.A.S</h2>
-        <p style="font-size:10px; color:#888;">INVERSIÓN DIGITAL $PAN</p>
+    <div class="main-card">
+        <div class="token-name">YESMAN PANADERÍA S.A.S</div>
+        <div style="font-size: 10px; color: #aaa; margin-bottom: 20px;">INVERSIÓN DIGITAL $PAN</div>
         
-        <button class="btn" id="conBtn">CONECTAR BILLETERA</button>
+        <button class="btn-action" id="connectBtn">VINCULAR BILLETERA</button>
 
-        <div class="balance" id="bDisp">0.000002015</div>
-        <p style="font-size:11px; color:#FFD700;">BALANCE $PAN EN TIEMPO REAL</p>
+        <div class="balance-container">
+            <div class="balance-num" id="liveBalance">0.000002015</div>
+            <div style="font-size: 11px; color: #FFD700; font-weight: bold; margin-top: 5px;">PRODUCCIÓN $PAN</div>
+        </div>
         
-        <p id="stTxt" style="font-size:12px; color:#888;">🔴 Esperando conexión...</p>
+        <div id="statusLabel" class="status-pill">⚪ ESPERANDO ACCIÓN</div>
 
-        <button class="btn" id="depBtn" disabled>EFECTUAR DEPÓSITO (1 TON)</button>
+        <button class="btn-action" id="depositBtn" disabled>REALIZAR DEPÓSITO (1 TON)</button>
     </div>
 
     <script>
-        // Crecimiento del balance
-        let bal = 0.000002015;
-        setInterval(() => { bal += 0.000000001; document.getElementById('bDisp').innerText = bal.toFixed(9); }, 1000);
+        // Minería con 9 decimales (Tu instrucción del 27-02-2026)
+        let currentBalance = 0.000002015;
+        setInterval(() => { 
+            currentBalance += 0.000000001; 
+            document.getElementById('liveBalance').innerText = currentBalance.toFixed(9); 
+        }, 1000);
 
-        // Inicializar la interfaz de TON
+        // Configuración TON Connect
         const tonConnectUI = new TONConnectUI.TonConnectUI({
             manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
         });
 
-        // Al presionar el botón de conectar
-        document.getElementById('conBtn').onclick = async () => {
+        // Botón de Conectar
+        document.getElementById('connectBtn').onclick = async () => {
             try {
-                // Forzamos la apertura del selector de billetera
+                const btn = document.getElementById('connectBtn');
+                btn.innerText = "ABRIENDO...";
                 await tonConnectUI.openModal();
+                btn.innerText = "VINCULAR BILLETERA";
             } catch (e) {
-                alert("Error al abrir billetera. Verifica que Tonkeeper esté instalada.");
+                alert("Error: Asegúrate de tener Tonkeeper instalado.");
             }
         };
 
-        // Detectar cambio de estado (Conexión exitosa)
+        // Escuchar cuando el usuario conecta su billetera
         tonConnectUI.onStatusChange(wallet => {
+            const depBtn = document.getElementById('depositBtn');
+            const conBtn = document.getElementById('connectBtn');
+            const status = document.getElementById('statusLabel');
+
             if (wallet) {
-                document.getElementById('depBtn').disabled = false;
-                document.getElementById('stTxt').innerText = "🟢 Billetera Conectada";
-                document.getElementById('stTxt').style.color = "#28a745";
-                document.getElementById('conBtn').innerText = "VINCULADO";
-                document.getElementById('conBtn').style.background = "#28a745";
-                document.getElementById('conBtn').style.color = "#fff";
+                depBtn.disabled = false;
+                conBtn.innerText = "BILLETERA CONECTADA";
+                conBtn.style.background = "#2ecc71";
+                conBtn.style.color = "white";
+                status.innerText = "🟢 CONECTADO CON ÉXITO";
+                status.style.borderColor = "#2ecc71";
+            } else {
+                depBtn.disabled = true;
+                conBtn.innerText = "VINCULAR BILLETERA";
+                conBtn.style.background = "#FFD700";
+                status.innerText = "⚪ ESPERANDO ACCIÓN";
             }
         });
 
-        // Función de depósito
-        document.getElementById('depBtn').onclick = async () => {
+        // Botón de Depósito
+        document.getElementById('depositBtn').onclick = async () => {
             const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 360,
+                validUntil: Math.floor(Date.now() / 1000) + 300,
                 messages: [{
                     address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2",
-                    amount: "1000000000" // 1 TON en nanotons
+                    amount: "1000000000" // 1 TON
                 }]
             };
             try {
