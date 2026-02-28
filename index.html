@@ -4,115 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yesman Panadería S.A.S</title>
-    <script src="https://telegram.org/js/telegram-web-app.js?1"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
-        :root { --gold: #FFD700; --blue: #0088cc; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
-        .card { background: #111; border: 2px solid var(--gold); border-radius: 24px; padding: 20px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); }
-        .balance-box { background: #000; padding: 15px; border-radius: 15px; margin: 20px 0; border: 1px solid #333; }
-        .balance { font-size: 32px; font-weight: 900; font-family: 'Courier New', monospace; color: #fff; }
-        .btn { padding: 18px; border-radius: 15px; border: none; font-weight: 800; width: 100%; margin: 8px 0; font-size: 14px; cursor: pointer; -webkit-appearance: none; }
-        .btn-wallet { background: var(--gold); color: #000; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
-        .btn-dep { background: var(--blue); color: white; }
-        .btn-dep:disabled { background: #222; color: #555; cursor: not-allowed; }
-        .btn-sell { background: #fff; color: #000; }
-        .status { font-size: 12px; margin: 10px 0; display: flex; align-items: center; justify-content: center; }
-        .dot { height: 10px; width: 10px; border-radius: 50%; margin-right: 8px; }
+        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
+        .card { background: #111; border: 2px solid #FFD700; border-radius: 20px; padding: 20px; }
+        .balance { font-size: 32px; font-weight: bold; margin: 20px 0; font-family: monospace; color: #fff; }
+        .btn { padding: 15px; width: 100%; border-radius: 12px; border: none; font-weight: bold; margin: 10px 0; cursor: pointer; display: block; }
+        #conBtn { background: #FFD700; color: #000; font-size: 16px; }
+        #depBtn { background: #0088cc; color: #fff; }
+        #depBtn:disabled { background: #333; color: #666; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <div style="font-size: 14px; color: var(--gold); font-weight: bold; letter-spacing: 1px;">YESMAN PANADERÍA S.A.S</div>
-        <div style="font-size: 10px; color: #888; margin-bottom: 10px;">INVERSIÓN DIGITAL $PAN</div>
-
-        <button class="btn btn-wallet" id="connectBtn">CONECTAR BILLETERA</button>
-
-        <div class="balance-box">
-            <div class="balance" id="bDisplay">0.000002015</div>
-            <div style="font-size: 11px; color: var(--gold); font-weight: bold;">BALANCE ACUMULADO</div>
-        </div>
+        <h2 style="color:#FFD700; margin:0;">YESMAN PANADERÍA S.A.S</h2>
+        <p style="font-size:10px; color:#888;">INVERSIÓN DIGITAL $PAN</p>
         
-        <div class="status">
-            <div id="statusDot" class="dot" style="background: #ff4444;"></div>
-            <span id="statusTxt" style="color: #888;">Desconectado</span>
-        </div>
+        <button class="btn" id="conBtn">CONECTAR MI BILLETERA</button>
 
-        <button class="btn btn-dep" id="btnDep" disabled>EFECTUAR DEPÓSITO (1 TON)</button>
-        <button class="btn btn-sell" onclick="alert('Venta exitosa')">VENDER PRODUCCIÓN</button>
+        <div class="balance" id="bDisp">0.000002015</div>
+        
+        <p id="stTxt" style="font-size:12px; color:#888;">🔴 Desconectado</p>
+
+        <button class="btn" id="depBtn" disabled>EFECTUAR DEPÓSITO (1 TON)</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        tg.ready(); tg.expand();
 
-        // Minería fluida
-        let balance = 0.000002015;
-        setInterval(() => {
-            balance += 0.000000001;
-            document.getElementById('bDisplay').innerText = balance.toFixed(9);
-        }, 1000);
+        let bal = 0.000002015;
+        setInterval(() => { bal += 0.000000001; document.getElementById('bDisp').innerText = bal.toFixed(9); }, 1000);
 
-        // INICIALIZACIÓN FORZADA
-        let tonConnectUI;
-        try {
-            tonConnectUI = new TONConnectUI.TonConnectUI({
-                manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json',
-                buttonRootId: null // Importante para usar nuestro propio botón
-            });
-        } catch (e) {
-            console.error("Error inicializando TON Connect");
-        }
+        // Conector simplificado al máximo
+        const tonUI = new TONConnectUI.TonConnectUI({
+            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
+        });
 
-        // ACCIÓN DEL BOTÓN DORADO
-        document.getElementById('connectBtn').addEventListener('click', async () => {
-            try {
-                if (tonConnectUI.connected) {
-                    await tonConnectUI.disconnect();
-                }
-                // Abrimos el selector de billeteras directamente
-                await tonConnectUI.openModal();
-            } catch (err) {
-                // Si falla el modal, intentamos un alert de diagnóstico
-                alert("Iniciando conexión... si no abre, por favor reinicia el bot.");
+        document.getElementById('conBtn').onclick = () => {
+            tonUI.openModal().catch(() => alert("Usa Tonkeeper o Wallet de Telegram"));
+        };
+
+        tonUI.onStatusChange(w => {
+            const d = document.getElementById('depBtn');
+            const c = document.getElementById('conBtn');
+            const s = document.getElementById('stTxt');
+            if (w) {
+                d.disabled = false;
+                c.innerText = "BILLETERA LISTA ✅";
+                c.style.background = "#28a745";
+                s.innerText = "🟢 Conectado";
             }
         });
 
-        // ESCUCHAR CAMBIOS DE ESTADO
-        tonConnectUI.onStatusChange(wallet => {
-            const btnDep = document.getElementById('btnDep');
-            const btnWall = document.getElementById('connectBtn');
-            const dot = document.getElementById('statusDot');
-            const txt = document.getElementById('statusTxt');
-
-            if (wallet) {
-                btnDep.disabled = false;
-                btnWall.innerText = "BILLETERA VINCULADA";
-                btnWall.style.background = "#28a745";
-                btnWall.style.color = "#fff";
-                dot.style.background = "#28a745";
-                txt.innerText = "Conectado";
-            } else {
-                btnDep.disabled = true;
-                btnWall.innerText = "CONECTAR BILLETERA";
-                btnWall.style.background = "#FFD700";
-                btnWall.style.color = "#000";
-                dot.style.background = "#ff4444";
-                txt.innerText = "Desconectado";
-            }
-        });
-
-        document.getElementById('btnDep').onclick = async () => {
+        document.getElementById('depBtn').onclick = async () => {
             const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 360,
-                messages: [{
-                    address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2",
-                    amount: "1000000000" 
-                }]
+                validUntil: Math.floor(Date.now() / 1000) + 300,
+                messages: [{ address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2", amount: "1000000000" }]
             };
-            try { await tonConnectUI.sendTransaction(tx); } catch (e) { alert("Transacción cancelada"); }
+            await tonUI.sendTransaction(tx).catch(e => alert("Error: " + e.message));
         };
     </script>
 </body>
