@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yesman App</title>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+</head>
+<body style="background:#000; color:#fff; text-align:center; font-family:sans-serif; padding-top:50px;">
+    <h2>YESMAN PANADERÍA S.A.S</h2>
+    <p>Si el botón azul aparece, ¡lo logramos!</p>
+    <div id="boton-ton" style="display:flex; justify-content:center;"></div>
+
+    <script>
+        const tonConnectUI = new TONConnectUI.TonConnectUI({
+            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json',
+            buttonRootId: 'boton-ton'
+        });
+    </script>
+</body>
+</html>
