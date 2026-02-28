@@ -4,39 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YESMAN PANADERÍA S.A.S</title>
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
-        .card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 25px; }
-        .balance { font-size: 30px; font-weight: bold; margin: 20px 0; color: #FFD700; font-family: monospace; }
-        .btn { padding: 20px; width: 100%; border-radius: 15px; border: none; font-weight: bold; margin: 10px 0; font-size: 16px; cursor: pointer; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; margin: 0; }
+        .card { background: linear-gradient(145deg, #111, #000); border: 2px solid #FFD700; border-radius: 25px; padding: 25px; box-shadow: 0 0 25px rgba(255,215,0,0.2); max-width: 400px; margin: auto; }
+        .balance { font-size: 34px; font-weight: bold; margin: 20px 0; color: #FFD700; font-family: 'Courier New', monospace; letter-spacing: 1px; }
+        .btn { display: block; padding: 18px; width: 100%; border-radius: 15px; border: none; font-weight: 900; margin: 12px 0; font-size: 15px; cursor: pointer; text-decoration: none; text-transform: uppercase; transition: 0.3s; }
         #conBtn { background: #FFD700; color: #000; }
-        #manualBtn { background: #0088cc; color: #fff; display: block; text-decoration: none; line-height: 20px; }
+        #manualBtn { background: #0088cc; color: #fff; box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4); }
+        #depBtn { background: #28a745; color: #fff; display: none; }
+        .status { font-size: 12px; color: #888; margin-top: 15px; font-style: italic; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>YESMAN PANADERÍA S.A.S</h2>
-        <div class="balance" id="bLive">0.000002015</div>
+        <h2 style="margin: 0; color: #FFD700; letter-spacing: 1px;">YESMAN PANADERÍA S.A.S</h2>
+        <p style="font-size: 10px; color: #aaa; margin-bottom: 25px;">INVERSIÓN DIGITAL $PAN</p>
         
-        <button class="btn" id="conBtn">1. CONECTAR (AUTO)</button>
+        <button class="btn" id="conBtn">1. CONECTAR BILLETERA</button>
 
-        <p style="font-size:12px; color:#888;">Si el de arriba no abre, usa este:</p>
+        <div class="balance" id="bLive">0.000002015</div>
+        <p style="font-size: 11px; color: #FFD700; margin-top: -15px;">PRODUCCIÓN ACTIVA</p>
 
-        <a href="https://tonkeeper.com/direct-connect?endpoint=https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json" class="btn" id="manualBtn">2. ABRIR EN TONKEEPER</a>
-    </div>
-
-    <script>
-        let b = 0.000002015;
-        setInterval(() => { b += 0.000000001; document.getElementById('bLive').innerText = b.toFixed(9); }, 1000);
-
-        const tonUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
-        });
-
-        document.getElementById('conBtn').onclick = () => {
-            tonUI.openModal().catch(() => alert("Usa el botón azul de abajo"));
-        };
-    </script>
-</body>
-</html>
+        <p style="font-size: 12px; color: #555; margin-top: 20px;">¿No abre el botón amarillo? Usa este:</p>
+        <a href="
