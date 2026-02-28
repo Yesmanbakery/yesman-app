@@ -9,90 +9,80 @@
     <style>
         :root { --gold: #FFD700; --blue: #0088cc; }
         body { font-family: sans-serif; background: #000; color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Contenedor principal */
         .card { background: #111; border: 2px solid var(--gold); border-radius: 24px; padding: 20px; width: 100%; max-width: 380px; text-align: center; }
-
-        /* Botón de Wallet - LO HACEMOS RESALTAR */
-        #ton-connect-btn { 
-            display: flex; 
-            justify-content: center; 
-            margin-bottom: 20px; 
-            padding: 10px;
-            background: #1a1a1a;
-            border-radius: 15px;
-            border: 1px dashed var(--gold); /* Un borde para que sepas dónde tocar */
-        }
-
-        .balance-box { background: #000; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
-        .balance { font-size: 32px; font-weight: 900; font-family: monospace; color: #fff; }
-        
-        .btn { padding: 18px; border-radius: 15px; border: none; font-weight: 800; width: 100%; margin: 8px 0; font-size: 14px; }
+        .balance-box { background: #000; padding: 15px; border-radius: 15px; margin: 20px 0; border: 1px solid #333; }
+        .balance { font-size: 32px; font-weight: 900; font-family: monospace; }
+        .btn { padding: 18px; border-radius: 15px; border: none; font-weight: 800; width: 100%; margin: 8px 0; font-size: 14px; cursor: pointer; }
+        .btn-wallet { background: var(--gold); color: #000; } /* BOTÓN NUEVO */
         .btn-dep { background: var(--blue); color: white; }
         .btn-dep:disabled { background: #333; color: #777; }
         .btn-sell { background: #fff; color: #000; }
-
-        .status-container { margin: 10px 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .status { font-size: 12px; margin: 10px 0; display: flex; align-items: center; justify-content: center; }
         .dot { height: 10px; width: 10px; border-radius: 50%; margin-right: 8px; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div style="font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 5px;">YESMAN PANADERÍA S.A.S</div>
-        <div style="font-size: 10px; color: #888; margin-bottom: 20px;">INVERSIÓN DIGITAL $PAN</div>
+        <div style="font-size: 14px; color: var(--gold); font-weight: bold;">YESMAN PANADERÍA S.A.S</div>
+        <div style="font-size: 10px; color: #888; margin-bottom: 10px;">INVERSIÓN DIGITAL $PAN</div>
 
-        <div id="ton-connect-btn"></div>
+        <button class="btn btn-wallet" id="connectBtn">CONECTAR BILLETERA</button>
 
         <div class="balance-box">
             <div class="balance" id="bDisplay">0.000002015</div>
             <div style="font-size: 11px; color: var(--gold); font-weight: bold;">BALANCE ACUMULADO</div>
         </div>
         
-        <div class="status-container">
+        <div class="status">
             <div id="statusDot" class="dot" style="background: #ff4444;"></div>
-            <span id="statusTxt" style="color: #888;">Wallet Desconectada</span>
+            <span id="statusTxt" style="color: #888;">Desconectado</span>
         </div>
 
         <button class="btn btn-dep" id="btnDep" disabled>EFECTUAR DEPÓSITO (1 TON)</button>
-        <button class="btn btn-sell" onclick="alert('Producción vendida con éxito')">VENDER PRODUCCIÓN</button>
+        <button class="btn btn-sell" onclick="alert('Venta de producción exitosa')">VENDER PRODUCCIÓN</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
 
-        // Motor de puntos $PAN (9 decimales)
+        // Minería de $PAN
         let balance = 0.000002015;
         setInterval(() => {
             balance += 0.000000001;
             document.getElementById('bDisplay').innerText = balance.toFixed(9);
         }, 1000);
 
-        // Inicializar TON Connect
+        // Configuración TON
         const tonConnectUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-btn'
+            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
         });
 
-        // Detectar conexión
+        // Al pulsar el botón dorado, abrimos el menú de billeteras
+        document.getElementById('connectBtn').onclick = () => {
+            tonConnectUI.openModal();
+        };
+
         tonConnectUI.onStatusChange(wallet => {
-            const btn = document.getElementById('btnDep');
+            const btnDep = document.getElementById('btnDep');
+            const btnWall = document.getElementById('connectBtn');
             const dot = document.getElementById('statusDot');
             const txt = document.getElementById('statusTxt');
 
             if (wallet) {
-                btn.disabled = false;
-                btn.style.background = "#0088cc";
+                btnDep.disabled = false;
+                btnWall.innerText = "BILLETERA VINCULADA";
+                btnWall.style.background = "#28a745";
+                btnWall.style.color = "#fff";
                 dot.style.background = "#28a745";
-                txt.innerText = "Conectado: " + wallet.account.address.substring(0, 5) + "...";
-                txt.style.color = "#28a745";
+                txt.innerText = "Conectado: " + wallet.account.address.substring(0, 4) + "...";
             } else {
-                btn.disabled = true;
-                btn.style.background = "#333";
+                btnDep.disabled = true;
+                btnWall.innerText = "CONECTAR BILLETERA";
+                btnWall.style.background = "#FFD700";
                 dot.style.background = "#ff4444";
-                txt.innerText = "Wallet Desconectada";
-                txt.style.color = "#888";
+                txt.innerText = "Desconectado";
             }
         });
 
