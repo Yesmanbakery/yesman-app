@@ -12,10 +12,11 @@
         .card { background: #111; border: 2px solid var(--gold); border-radius: 24px; padding: 20px; width: 100%; max-width: 380px; text-align: center; }
         .balance-box { background: #000; padding: 15px; border-radius: 15px; margin: 20px 0; border: 1px solid #333; }
         .balance { font-size: 32px; font-weight: 900; font-family: monospace; }
-        .btn { padding: 18px; border-radius: 15px; border: none; font-weight: 800; width: 100%; margin: 8px 0; font-size: 14px; cursor: pointer; }
-        .btn-wallet { background: var(--gold); color: #000; } /* BOTÓN NUEVO */
+        .btn { padding: 18px; border-radius: 15px; border: none; font-weight: 800; width: 100%; margin: 8px 0; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-wallet { background: var(--gold); color: #000; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
         .btn-dep { background: var(--blue); color: white; }
-        .btn-dep:disabled { background: #333; color: #777; }
+        .btn-dep:disabled { background: #333; color: #777; cursor: not-allowed; }
         .btn-sell { background: #fff; color: #000; }
         .status { font-size: 12px; margin: 10px 0; display: flex; align-items: center; justify-content: center; }
         .dot { height: 10px; width: 10px; border-radius: 50%; margin-right: 8px; }
@@ -47,21 +48,30 @@
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
 
-        // Minería de $PAN
+        // Minería
         let balance = 0.000002015;
         setInterval(() => {
             balance += 0.000000001;
             document.getElementById('bDisplay').innerText = balance.toFixed(9);
         }, 1000);
 
-        // Configuración TON
+        // Inicializar con configuración forzada
         const tonConnectUI = new TONConnectUI.TonConnectUI({
             manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
         });
 
-        // Al pulsar el botón dorado, abrimos el menú de billeteras
-        document.getElementById('connectBtn').onclick = () => {
-            tonConnectUI.openModal();
+        // REINTENTO FORZADO AL TOCAR
+        document.getElementById('connectBtn').onclick = async () => {
+            console.log("Intentando abrir wallet...");
+            try {
+                // Si ya está conectado, lo desconectamos para que pueda reintentar
+                if (tonConnectUI.connected) {
+                    await tonConnectUI.disconnect();
+                }
+                await tonConnectUI.openModal();
+            } catch (err) {
+                alert("Error de conexión: Por favor recarga el bot.");
+            }
         };
 
         tonConnectUI.onStatusChange(wallet => {
@@ -81,6 +91,7 @@
                 btnDep.disabled = true;
                 btnWall.innerText = "CONECTAR BILLETERA";
                 btnWall.style.background = "#FFD700";
+                btnWall.style.color = "#000";
                 dot.style.background = "#ff4444";
                 txt.innerText = "Desconectado";
             }
