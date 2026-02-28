@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YESMAN PANADERÍA S.A.S</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tonconnect-ui/2.0.9/tonconnect-ui.min.js"></script>
     <style>
         body { background: #000; color: #fff; text-align: center; padding: 20px; font-family: sans-serif; }
         .card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 30px; max-width: 400px; margin: auto; }
@@ -15,37 +15,36 @@
 <body>
     <div class="card">
         <h3>YESMAN PANADERÍA S.A.S</h3>
-        <div class="balance" id="b">0.000002015</div>
+        <div class="balance" id="b">0.000002052</div>
         <button class="btn" id="btnConnect">VINCULAR CUALQUIER BILLETERA</button>
-        <p id="info" style="margin-top:15px; font-size:12px; color:#888;">Verificando sistema...</p>
+        <p id="info" style="margin-top:15px; font-size:12px; color:#888;">Cargando sistema...</p>
     </div>
 
     <script>
-        // Minería
-        let val = 0.000002015;
+        // Minería visual (Instrucción del usuario)
+        let val = 0.000002052;
         setInterval(() => { val += 0.000000001; document.getElementById('b').innerText = val.toFixed(9); }, 1000);
 
-        // Función de inicio forzado
-        function iniciarApp() {
+        function iniciar() {
+            // Verificamos si la nueva librería cargó
             if (typeof TONConnectUI === 'undefined') {
-                document.getElementById('info').innerText = "❌ Error de conexión. Reintentando...";
-                setTimeout(iniciarApp, 2000); // Reintenta cada 2 segundos
+                document.getElementById('info').innerText = "❌ Bloqueo detectado. Intenta con WiFi o Chrome.";
                 return;
             }
 
-            document.getElementById('info').innerText = "✅ SISTEMA LISTO";
+            document.getElementById('info').innerText = "✅ LISTO PARA CONECTAR";
             document.getElementById('info').style.color = "#28a745";
 
-            const tonUI = new TONConnectUI.TonConnectUI({
+            const ui = new TONConnectUI.TonConnectUI({
                 manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
             });
 
             document.getElementById('btnConnect').onclick = () => {
-                tonUI.openModal().catch(e => alert("Error: " + e));
+                ui.openModal().catch(e => alert("Error: " + e));
             };
         }
 
-        window.onload = iniciarApp;
+        window.onload = iniciar;
     </script>
 </body>
 </html>
