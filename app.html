@@ -2,59 +2,45 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YESMAN PANADERÍA S.A.S</title>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST YESMAN</title>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
-        .card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 25px; max-width: 400px; margin: auto; }
-        .balance { font-size: 32px; font-weight: bold; margin: 20px 0; color: #FFD700; font-family: monospace; }
-        .btn { display: block; padding: 20px; width: 100%; border-radius: 15px; border: none; font-weight: bold; margin: 10px 0; font-size: 16px; cursor: pointer; }
-        #conBtn { background: #FFD700; color: #000; }
-        #depBtn { background: #28a745; color: #fff; display: none; }
+        body { background: #000; color: #fff; text-align: center; padding: 50px; font-family: sans-serif; }
+        .btn { padding: 20px; width: 100%; background: #FFD700; color: #000; border: none; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .box { border: 1px solid #333; padding: 20px; margin-top: 20px; border-radius: 15px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3>YESMAN PANADERÍA S.A.S</h3>
-        <p style="font-size:10px; color:#aaa;">INVERSIÓN DIGITAL $PAN</p>
-        
-        <button class="btn" id="conBtn">CONECTAR BILLETERA</button>
-
-        <div class="balance" id="bLive">0.000002015</div>
-        
-        <div id="ton-connect"></div> <button class="btn" id="depBtn">REALIZAR DEPÓSITO (1 TON)</button>
+    <div class="box">
+        <h2>PASO 1: PRUEBA DE BOTÓN</h2>
+        <button class="btn" id="testBtn">VINCULAR BILLETERA</button>
+        <p id="msg" style="color: #888; margin-top: 10px;">Esperando clic...</p>
     </div>
 
     <script>
-        // Tu contador de 9 decimales
-        let b = 0.000002015;
-        setInterval(() => { b += 0.000000001; document.getElementById('bLive').innerText = b.toFixed(9); }, 1000);
-
-        // Inicialización UNIVERSAL (Añadimos un número al azar al final para saltar el caché)
-        const tonUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json?v=' + Date.now(),
-            buttonRootId: 'ton-connect'
-        });
-
-        // Al tocar tu botón amarillo, se abre el selector de wallets
-        document.getElementById('conBtn').onclick = () => {
-            tonUI.openModal();
+        // Verificamos si la librería cargó
+        window.onload = function() {
+            if (typeof TONConnectUI !== 'undefined') {
+                document.getElementById('msg').innerText = "✅ Librería cargada correctamente";
+            } else {
+                document.getElementById('msg').innerText = "❌ ERROR: La librería no cargó";
+            }
         };
 
-        tonUI.onStatusChange(wallet => {
-            if (wallet) {
-                document.getElementById('conBtn').style.display = 'none';
-                document.getElementById('depBtn').style.display = 'block';
-            }
+        // Inicializamos
+        const tonConnectUI = new TONConnectUI.TonConnectUI({
+            manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
         });
 
-        document.getElementById('depBtn').onclick = async () => {
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 300,
-                messages: [{ address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2", amount: "1000000000" }]
-            };
-            await tonUI.sendTransaction(tx).catch(() => alert("Cancelado"));
+        document.getElementById('testBtn').onclick = async function() {
+            // Esta alerta nos dirá si el botón funciona
+            alert("Intentando conectar con Web3..."); 
+            try {
+                await tonConnectUI.openModal();
+            } catch (e) {
+                alert("Error al abrir: " + e);
+            }
         };
     </script>
 </body>
