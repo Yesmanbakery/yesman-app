@@ -2,38 +2,55 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yesman Panadería S.A.S</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        :root { --gold: #FFD700; --blue: #0088cc; }
+        body { font-family: sans-serif; background: #000; color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: #111; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; width: 100%; max-width: 350px; text-align: center; }
+        .balance { font-size: 32px; font-weight: 900; margin: 15px 0; font-family: monospace; }
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; color: white; }
+        #ton-connect-btn { display: flex; justify-content: center; margin: 20px 0; min-height: 44px; }
+    </style>
 </head>
-<body style="background:#000; color:#fff; text-align:center; font-family:sans-serif; padding:20px;">
-    
-    <h2 style="color:#FFD700;">YESMAN PANADERÍA S.A.S</h2>
-    <p id="status">Cargando conexión segura...</p>
-
-    <div id="ton-connect-btn" style="display:flex; justify-content:center; margin:30px 0; min-height:44px;"></div>
+<body>
+    <div class="card">
+        <div style="font-size: 12px; color: var(--gold); font-weight: bold;">YESMAN PANADERÍA S.A.S</div>
+        <div class="balance">0.000002015</div>
+        
+        <div id="ton-connect-btn"></div>
+        
+        <button class="btn" id="btn-deposito" style="background: var(--blue);">DEPÓSITO (1 TON)</button>
+        <button class="btn" style="background: #fff; color: #000;">VENDER PRODUCCIÓN</button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        tg.ready(); tg.expand();
 
-        // Inicializamos la Wallet
+        // Conexión a la billetera
         const tonConnectUI = new TONConnectUI.TonConnectUI({
             manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-btn'
         });
 
-        // Verificamos si carga
-        tonConnectUI.onStatusChange(wallet => {
-            if (wallet) {
-                document.getElementById('status').innerText = "¡Billetera Conectada!";
-                document.getElementById('status').style.color = "#28a745";
+        // Configuración del botón de depósito
+        document.getElementById('btn-deposito').onclick = async () => {
+            if (!tonConnectUI.connected) {
+                await tonConnectUI.openModal();
             } else {
-                document.getElementById('status').innerText = "Conecta tu wallet para jugar";
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 360,
+                    messages: [{
+                        address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2",
+                        amount: "1000000000" // 1 TON
+                    }]
+                };
+                await tonConnectUI.sendTransaction(tx);
             }
-        });
+        };
     </script>
 </body>
 </html>
